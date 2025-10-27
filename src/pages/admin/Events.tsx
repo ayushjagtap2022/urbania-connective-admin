@@ -17,15 +17,20 @@ const EventsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [timeFilter, setTimeFilter] = useState<'all' | 'upcoming' | 'past'>('all');
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(9); // page size
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   // Fetch events with optimized query
+  // Request a larger limit so all events are retrieved (temporary)
+
+  // Fetch events with pagination and filters
   const { data: eventsData, isLoading } = useQuery({
-    queryKey: ['events'],
-    queryFn: () => eventService.getAllEvents(),
+    queryKey: ['events', { page, limit, category: categoryFilter, search: searchQuery }],
+  queryFn: () => eventService.getAllEvents(page, limit, categoryFilter === 'all' ? undefined : categoryFilter, undefined, searchQuery),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
@@ -81,11 +86,9 @@ const EventsPage = () => {
   const handleDeleteEvent = async (event: Event) => {
     if (window.confirm("Are you sure you want to delete this event?")) {
       try {
-        await eventService.deleteEvent(event._id);
-        queryClient.invalidateQueries({ queryKey: ['events'] });
-        toast.success("Event deleted successfully");
+        await deleteMutation.mutateAsync(event._id);
       } catch (error) {
-        toast.error("Failed to delete event");
+        // deleteMutation onError will handle toast
       }
     }
   };
@@ -102,6 +105,22 @@ const EventsPage = () => {
   // Add a handler for viewing attendees
   const handleViewAttendees = (event: Event) => {
     navigate(`/admin/events/${event._id}/attendees`);
+  };
+
+  // Reset page when filters/search change
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    setPage(1);
+  };
+
+  const handleCategoryChange = (val: string) => {
+    setCategoryFilter(val);
+    setPage(1);
+  };
+
+  const handleTimeFilterChange = (val: 'all' | 'upcoming' | 'past') => {
+    setTimeFilter(val);
+    setPage(1);
   };
 
   if (showForm || editingEvent) {
@@ -143,13 +162,13 @@ const EventsPage = () => {
               <Input
                 placeholder="Search events..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-8 xs:pl-10 w-full text-xs xs:text-sm"
               />
             </div>
 
             <div className="flex flex-col xs:flex-row gap-2 xs:gap-3 sm:gap-4">
-              <Select value={categoryFilter} onValueChange={(value: string) => setCategoryFilter(value)}>
+              <Select value={categoryFilter} onValueChange={(value: string) => handleCategoryChange(value)}>
                 <SelectTrigger className="w-full xs:w-[160px] sm:w-[180px] text-xs xs:text-sm">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
@@ -161,7 +180,7 @@ const EventsPage = () => {
                 </SelectContent>
               </Select>
 
-              <Select value={timeFilter} onValueChange={(value: 'all' | 'upcoming' | 'past') => setTimeFilter(value)}>
+              <Select value={timeFilter} onValueChange={(value: 'all' | 'upcoming' | 'past') => handleTimeFilterChange(value)}>
                 <SelectTrigger className="w-full xs:w-[160px] sm:w-[180px] text-xs xs:text-sm">
                   <SelectValue placeholder="All, Upcoming or Past" />
                 </SelectTrigger>
@@ -194,6 +213,26 @@ const EventsPage = () => {
                   No events found matching your search criteria.
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Pagination controls */}
+          {eventsData && eventsData.totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>Prev</Button>
+                <span className="text-sm">Page {eventsData.currentPage || page} of {eventsData.totalPages}</span>
+                <Button variant="outline" size="sm" disabled={page === eventsData.totalPages} onClick={() => setPage(p => Math.min(eventsData.totalPages, p + 1))}>Next</Button>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm">Per page:</label>
+                <select value={limit} onChange={(e) => { setLimit(Number(e.target.value)); setPage(1); }} className="border rounded px-2 py-1 text-sm">
+                  <option value={6}>6</option>
+                  <option value={9}>9</option>
+                  <option value={12}>12</option>
+                  <option value={24}>24</option>
+                </select>
+              </div>
             </div>
           )}
         </CardContent>

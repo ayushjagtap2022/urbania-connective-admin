@@ -218,7 +218,17 @@ const EventForm: React.FC<EventFormProps> = ({
                 await eventService.createEvent(formData);
                 toast.success("Event created successfully");
             }
-            onSuccess();
+
+            // Ensure the events list refreshes after create/update
+            try {
+                queryClient.invalidateQueries({ queryKey: ['events'] });
+            } catch (err) {
+                console.warn('Failed to invalidate events query', err);
+            }
+
+            // reset submitting state and call onSuccess to close the form
+            setIsSubmitting(false);
+            onSuccess && onSuccess();
         } catch (error) {
             console.error('Form submission error:', error);
             toast.error(error instanceof Error ? error.message : "Failed to save event");
