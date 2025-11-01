@@ -18,6 +18,7 @@ const defaultForm = {
   firstName: '',
   lastName: '',
   mobile: '',
+  gender: '',
   email: '',
   phone: '',
   address: '',
@@ -129,6 +130,7 @@ const AddUser = () => {
     if (!form.firstName.trim()) newErrors.firstName = 'First name is required.';
     if (!form.lastName.trim()) newErrors.lastName = 'Last name is required.';
     if (!form.mobile.trim()) newErrors.mobile = 'Mobile number is required.';
+    if (!form.gender.trim()) newErrors.gender = 'Gender is required.';
     if (!form.email.trim()) newErrors.email = 'Email is required.';
     else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) newErrors.email = 'Invalid email format.';
     if (!form.password.trim()) newErrors.password = 'Password is required.';
@@ -263,6 +265,23 @@ const AddUser = () => {
                     <Label htmlFor="mobile" className="text-sm font-medium">Mobile Number <span className="text-destructive">*</span></Label>
                     <Input id="mobile" name="mobile" value={form.mobile} onChange={handleChange} className={errors.mobile ? 'border-destructive' : ''} placeholder="Enter mobile number" />
                     {errors.mobile && <p className="text-xs text-destructive flex items-center gap-1 mt-1"><XCircle className="h-3 w-3" /> {errors.mobile}</p>}
+                  </div>
+                  {/* Gender */}
+                  <div className="col-span-1">
+                    <Label htmlFor="gender" className="text-sm font-medium">Gender <span className="text-destructive">*</span></Label>
+                    <select
+                      id="gender"
+                      name="gender"
+                      value={form.gender}
+                      onChange={handleSelectChange}
+                      className={`w-full border rounded px-3 py-2 ${errors.gender ? 'border-destructive' : ''}`}
+                      required
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
+                    {errors.gender && <p className="text-xs text-destructive flex items-center gap-1 mt-1"><XCircle className="h-3 w-3" /> {errors.gender}</p>}
                   </div>
                   {/* Email */}
                   <div className="col-span-1">

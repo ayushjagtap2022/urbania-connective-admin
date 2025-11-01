@@ -550,6 +550,7 @@ const Users = () => {
                                 <TableHead className="px-2 sm:px-4">User Info</TableHead>
                                 <TableHead className="px-2 sm:px-4 hidden sm:table-cell">Contact</TableHead>
                                 <TableHead className="px-2 sm:px-4 hidden lg:table-cell">User ID</TableHead>
+                                <TableHead className="px-2 sm:px-4 hidden md:table-cell">Gender</TableHead>
                                 <TableHead className="px-2 sm:px-4 hidden md:table-cell">Roles</TableHead>
                                 <TableHead className="px-2 sm:px-4 hidden lg:table-cell">Status</TableHead>
                                 <TableHead className="px-2 sm:px-4 hidden md:table-cell">Created At</TableHead>
@@ -582,6 +583,15 @@ const Users = () => {
                                     <TableCell className="px-2 sm:px-4 hidden lg:table-cell">
                                         {user.customId ? (
                                             <span className="text-sm">{user.customId}</span>
+                                        ) : (
+                                            <span className="text-muted-foreground text-xs">—</span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="px-2 sm:px-4 hidden md:table-cell">
+                                        {user.gender ? (
+                                            <Badge variant="outline" className="text-xs capitalize">
+                                                {user.gender}
+                                            </Badge>
                                         ) : (
                                             <span className="text-muted-foreground text-xs">—</span>
                                         )}

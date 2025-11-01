@@ -5,6 +5,7 @@ export interface User {
   firstName: string;
   lastName: string;
   mobile: string;
+  gender?: string;
   email: string;
   phone?: string;
   address?: string;
@@ -20,6 +21,17 @@ export interface User {
   flatNo?: string;
   birthdate?: string;
   bio?: string;
+  middleName?: string;
+  occupationProfile?: string;
+  workplaceAddress?: string;
+  familyCount?: number;
+  maleAbove18?: number;
+  maleAbove60?: number;
+  maleUnder18?: number;
+  femaleAbove18?: number;
+  femaleAbove60?: number;
+  femaleUnder18?: number;
+  forumContribution?: string;
 }
 
 export interface UpdateUserData {

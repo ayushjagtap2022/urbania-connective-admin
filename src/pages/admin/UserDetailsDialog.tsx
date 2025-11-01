@@ -79,6 +79,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ user, isOpen, onC
                     <DetailItem icon={<KeyRound />} label="User ID" value={user.customId} />
                     <DetailItem icon={<Mail />} label="Email" value={<a href={`mailto:${user.email}`} className="text-primary hover:underline">{user.email}</a>} />
                     <DetailItem icon={<Phone />} label="Mobile" value={user.mobile} />
+                    {user.gender && <DetailItem icon={<UserRound />} label="Gender" value={<Badge variant="outline" className="capitalize">{user.gender}</Badge>} />}
                     {user.phone && <DetailItem icon={<Phone />} label="Phone" value={user.phone} />}
                     <DetailItem icon={<Home />} label="Address" value={user.address} />
                     
